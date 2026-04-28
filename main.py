@@ -47,6 +47,7 @@ def get_audio_file(video_id: str):
 
 
 def download_audio(video_id: str):
+    "cookiefile": "www.youtube.com_cookies.txt",
     url = f"https://www.youtube.com/watch?v={video_id}"
 
     ydl_opts = {
