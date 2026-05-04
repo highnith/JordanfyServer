@@ -52,6 +52,7 @@ def download_audio(video_id: str):
 
     ydl_opts = {
         "format": "bestaudio/best",
+        "cookiefile" : './www.youtube.com_cookies.txt',
         "outtmpl": str(DOWNLOAD_DIR / "%(id)s.%(ext)s"),
         "noplaylist": True,
         "quiet": True,
