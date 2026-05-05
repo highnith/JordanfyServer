@@ -51,9 +51,11 @@ def download_audio(video_id: str):
     url = f"https://www.youtube.com/watch?v={video_id}"
 
     ydl_opts = {
-        "format": "bestaudio/best",
+        "format": "'bestaudio[ext=m4a]/bestaudio/best'",
         "cookiefile" : './www.youtube.com_cookies.txt',
         "outtmpl": str(DOWNLOAD_DIR / "%(id)s.%(ext)s"),
+        'http_headers': {
+        'User-Agent': 'Mozilla/5.0'},
         "noplaylist": True,
         "quiet": True,
         "postprocessors": [{
