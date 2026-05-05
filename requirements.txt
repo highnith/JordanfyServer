@@ -1,5 +1,5 @@
 fastapi
 uvicorn
-yt-dlp -U
+yt-dlp 
 python-multipart
 apscheduler

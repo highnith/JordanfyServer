@@ -75,13 +75,13 @@ def download_audio(video_id: str):
 
 
 @app.get("/search")
-def search(q: str):
+def search(q: str, limit: int = 20):
     with YoutubeDL({
         "quiet": True,
         "noplaylist": True,
         "extract_flat": True
     }) as ydl:
-        info = ydl.extract_info(f"ytsearch20:{q}", download=False)
+        info = ydl.extract_info(f"ytsearch{limit}:{q}", download=False)
 
     return info
 
@@ -106,6 +106,7 @@ def stream(video_id: str):
         file_path = download_audio(video_id)
 
     return FileResponse(file_path, media_type="audio/mpeg")
+
 
 
 
