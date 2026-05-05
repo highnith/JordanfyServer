@@ -12,6 +12,12 @@ from contextlib import asynccontextmanager
 DOWNLOAD_DIR = Path("/tmp/downloads")
 DOWNLOAD_DIR.mkdir(parents=True, exist_ok=True)
 
+import os
+
+cookies_content = os.getenv("YOUTUBE_COOKIES")
+if cookies_content:
+    with open("cookies.txt", "w") as f:
+        f.write(cookies_content)
 
 def cleanup_by_limit(max_files: int = 50):
     files = sorted(
@@ -52,8 +58,9 @@ def download_audio(video_id: str):
 
     ydl_opts = {
         "format": "bestaudio[ext=m4a]/bestaudio/best",
-        "cookiefile" : './www.youtube.com_cookies.txt',
+        "cookiefile" : "cookies.txt",
         "outtmpl": str(DOWNLOAD_DIR / "%(id)s.%(ext)s"),
+        "extractor_args": {"youtube": {"js_runtimes": ["nodejs"]}},
         'http_headers': {
         'User-Agent': 'Mozilla/5.0'},
         "noplaylist": True,
