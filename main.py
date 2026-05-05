@@ -64,14 +64,14 @@ def download_audio(video_id: str):
         url = f"https://www.youtube.com/watch?v={video_id}"
 
         ydl_opts = {
-            "format": "bestaudio[ext=m4a]/bestaudio/best",
+            "format": "bestaudio/best",
             "outtmpl": str(DOWNLOAD_DIR / "%(id)s.%(ext)s"),
             "cookiefile": "cookies.txt",
             "http_headers": {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
     },
             "noplaylist": True,
-            "quiet": True,
+            "quiet": False,
             "postprocessors": [{
                 "key": "FFmpegExtractAudio",
                 "preferredcodec": "mp3",
