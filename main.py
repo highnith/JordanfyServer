@@ -60,7 +60,11 @@ def download_audio(video_id: str):
         "format": "bestaudio[ext=m4a]/bestaudio/best",
         "cookiefile" : "cookies.txt",
         "outtmpl": str(DOWNLOAD_DIR / "%(id)s.%(ext)s"),
-        "extractor_args": {"youtube": {"js_runtimes": ["nodejs"]}},
+        "extractor_args": {
+        "youtube": {
+            "player_client": ["android", "web"],
+        }
+    },
         'http_headers': {
         'User-Agent': 'Mozilla/5.0'},
         "noplaylist": True,
