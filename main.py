@@ -70,11 +70,7 @@ def download_audio(video_id: str):
 
     return get_audio_file(video_id)
 
-@app.post("/update-cookies")
-async def update_cookies(file: UploadFile):
-    with open("cookies.txt", "wb") as f:
-        f.write(await file.read())
-    return {"status": "ok"}
+
 
 @app.get("/search")
 def search(q: str):
