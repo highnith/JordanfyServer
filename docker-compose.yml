@@ -1,0 +1,9 @@
+services:
+  jordanfy:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mio-progetto
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
