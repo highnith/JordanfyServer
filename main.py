@@ -5,6 +5,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from yt_dlp import YoutubeDL
+import tempfile
 
 DOWNLOAD_DIR = Path("/tmp/downloads")
 DOWNLOAD_DIR.mkdir(parents=True, exist_ok=True)
@@ -56,31 +57,43 @@ def get_audio_file(video_id: str):
 
 def download_audio(video_id: str):
     with get_lock(video_id):
-        # Se nel frattempo un altro thread ha già scaricato il file, non riscaricarlo
         existing = get_audio_file(video_id)
         if existing:
             return existing
 
         url = f"https://www.youtube.com/watch?v={video_id}"
 
-        ydl_opts = {
-            "format": "m4a",
-            "outtmpl": str(DOWNLOAD_DIR / "%(id)s.%(ext)s"),
-            "cookiefile": "cookies.txt",
-            "noplaylist": True,
-            "quiet": False,
-            "postprocessors": [{
-                "key": "FFmpegExtractAudio",
-                "preferredcodec": "mp3",
-                "preferredquality": "192",
-            }],
-        }
+        # Scarichiamo in una sottocartella temporanea dedicata a questo download
+        with tempfile.TemporaryDirectory(dir=DOWNLOAD_DIR) as tmp_dir:
+            tmp_outtmpl = str(Path(tmp_dir) / "%(id)s.%(ext)s")
 
-        with YoutubeDL(ydl_opts) as ydl:
-            ydl.extract_info(url, download=True)
+            ydl_opts = {
+                "format": "m4a",
+                "outtmpl": tmp_outtmpl,
+                "cookiefile": "cookies.txt",
+                "noplaylist": True,
+                "quiet": False,
+                "postprocessors": [{
+                    "key": "FFmpegExtractAudio",
+                    "preferredcodec": "mp3",
+                    "preferredquality": "192",
+                }],
+            }
+
+            with YoutubeDL(ydl_opts) as ydl:
+                ydl.extract_info(url, download=True)
+
+            # Trova il file mp3 risultante nella cartella temporanea
+            tmp_files = list(Path(tmp_dir).glob(f"{video_id}.mp3"))
+            if not tmp_files:
+                return None
+
+            final_path = DOWNLOAD_DIR / f"{video_id}.mp3"
+            # Rename ATOMICO: nessuno vedrà mai un file parziale con questo nome
+            os.replace(tmp_files[0], final_path)
 
         cleanup_by_limit(max_files=50)
-        return get_audio_file(video_id)
+        return final_path
 
 
 @app.get("/search")
